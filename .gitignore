@@ -1,0 +1,82 @@
+# Virtual environments
+.venv/
+venv/
+env/
+ENV/
+
+# Python cache and compiled files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Environment variables and secrets
+.env
+.env.*
+!.env.example
+
+# Build artifacts
+build/
+dist/
+*.egg-info/
+.eggs/
+wheels/
+
+# Test and coverage output
+.pytest_cache/
+.coverage
+.coverage.*
+htmlcov/
+coverage.xml
+test-results/
+junit.xml
+
+# Ruff, mypy and type-checker caches
+.ruff_cache/
+.mypy_cache/
+.pyright/
+.dmypy.json
+dmypy.json
+
+# Logs
+*.log
+logs/
+
+# Local databases
+*.db
+*.sqlite
+*.sqlite3
+
+# IDE settings
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Operating system files
+.DS_Store
+Thumbs.db
+
+# Local project data
+uploads/
+tmp/
+temp/
+
+# Agent traces and generated reports
+traces/
+reports/
+generated/
+
+# Docker local overrides
+docker-compose.override.yml
+
+# Secrets and credentials
+credentials.json
+secrets.json
+*.pem
+*.key
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Local package manager files
+pip-wheel-metadata/
