@@ -1,13 +1,8 @@
 import json
 from enum import StrEnum
 from functools import lru_cache
-from pathlib import Path
-
 from pydantic import Field, model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
-
-PROJECT_ROOT = Path(__file__).resolve().parents[2]
-
 
 class AIProvider(StrEnum):
     OPENAI = "openai"
@@ -74,7 +69,7 @@ class Settings(BaseSettings):
     database_auto_create: bool = True
 
     model_config = SettingsConfigDict(
-        env_file=PROJECT_ROOT / ".env",
+        env_file=".env",
         env_file_encoding="utf-8",
         extra="ignore",
     )

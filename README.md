@@ -1,6 +1,6 @@
 # AI Incident Investigator
 
-AI Incident Investigator is a FastAPI and CLI application that analyzes uploaded logs and runs structured AI-assisted incident investigations. Version 0.5.1 separates large log content from relational metadata through a pluggable storage layer.
+AI Incident Investigator is a FastAPI and CLI application that analyzes uploaded logs and runs structured AI-assisted incident investigations. It supports pluggable AI providers, relational databases, local or S3-compatible log storage, multi-user workspaces, and bundled database migrations.
 
 ## Features
 
@@ -91,7 +91,7 @@ DATABASE_AUTO_CREATE=false
 ```
 
 ```bash
-alembic upgrade head
+incident-investigator migrate
 ```
 
 ### Upgrade from 0.2.0
@@ -102,6 +102,8 @@ Migration `20260725_0002` removes `raw_log` from the relational database. It del
 
 ```bash
 incident-investigator
+# or explicitly:
+incident-investigator serve --host 127.0.0.1 --port 8000
 ```
 
 Open `http://127.0.0.1:8000/docs`.
@@ -267,5 +269,5 @@ cost. Provider invoices remain the authoritative billing record.
 Apply the new schema:
 
 ```bash
-alembic upgrade head
+incident-investigator migrate
 ```

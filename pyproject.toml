@@ -1,5 +1,5 @@
 [build-system]
-requires = ["setuptools>=75"]
+requires = ["setuptools>=77"]
 build-backend = "setuptools.build_meta"
 
 [project]
@@ -8,7 +8,8 @@ dynamic = ["version"]
 description = "Provider-neutral AI-powered incident classification, root-cause analysis, and reporting."
 readme = "README.md"
 requires-python = ">=3.12"
-license = { text = "MIT" }
+license = "MIT"
+license-files = ["LICENSE"]
 authors = [{ name = "Boris Tomka" }]
 keywords = ["ai", "incident-analysis", "log-analysis", "root-cause-analysis", "fastapi", "observability", "incident-response"]
 classifiers = [
@@ -17,7 +18,6 @@ classifiers = [
     "Framework :: FastAPI",
     "Intended Audience :: Developers",
     "Intended Audience :: Information Technology",
-    "License :: OSI Approved :: MIT License",
     "Operating System :: OS Independent",
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3.12",
@@ -34,6 +34,7 @@ dependencies = [
     "sqlalchemy>=2.0",
     "itsdangerous>=2.2",
     "email-validator>=2.2",
+    "alembic>=1.14",
 ]
 
 [project.optional-dependencies]
@@ -55,7 +56,6 @@ dev = [
     "aiomysql>=0.2",
     "openai-agents[litellm]>=0.2",
     "boto3>=1.35",
-    "alembic>=1.14",
     "build",
     "httpx",
     "pytest",
@@ -79,7 +79,7 @@ version = { attr = "incident_investigator.__version__" }
 where = ["src"]
 
 [tool.setuptools.package-data]
-incident_investigator = ["py.typed", "dashboard/static/*"]
+incident_investigator = ["py.typed", "dashboard/static/*", "database/migrations/script.py.mako"]
 
 [tool.pytest.ini_options]
 pythonpath = ["src"]
