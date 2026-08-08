@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="dark light">
+  <title>AI Incident Investigator</title>
+  <link rel="stylesheet" href="/dashboard/assets/dashboard.css">
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar" id="sidebar">
+      <a class="brand" href="#overview" aria-label="AI Incident Investigator home">
+        <span class="brand-mark">AI</span>
+        <span><strong>Incident</strong><small>Investigator</small></span>
+      </a>
+      <nav class="nav" aria-label="Main navigation">
+        <button class="nav-item active" data-view="overview"><span class="nav-icon">⌂</span>Overview</button>
+        <button class="nav-item" data-view="incidents"><span class="nav-icon">◫</span>Incidents</button>
+        <button class="nav-item" data-view="new"><span class="nav-icon">＋</span>New investigation</button>
+        <button class="nav-item" data-view="analytics"><span class="nav-icon">⌁</span>Analytics</button>
+        <button class="nav-item" data-view="team"><span class="nav-icon">♙</span>Team</button>
+        <button class="nav-item" data-view="settings"><span class="nav-icon">⚙</span>Settings</button>
+      </nav>
+      <div class="sidebar-bottom">
+        <a href="#help" data-view="help">Help <span>→</span></a>
+        <a href="/docs" target="_blank" rel="noreferrer">API documentation <span>↗</span></a>
+        <a href="/health" target="_blank" rel="noreferrer">System health <span>↗</span></a>
+        <div class="system-pill"><span class="status-dot"></span><span>System operational</span></div>
+      </div>
+    </aside>
+
+    <main class="main">
+      <header class="topbar">
+        <button class="mobile-menu" id="mobile-menu" aria-label="Open menu">☰</button>
+        <div class="command-search">
+          <span>⌕</span>
+          <input id="global-search" type="search" placeholder="Search incidents, files, root causes..." autocomplete="off">
+          <kbd>/</kbd>
+        </div>
+        <div class="top-actions">
+          <button class="icon-button" id="theme-toggle" aria-label="Toggle theme">◐</button>
+          <button class="primary compact" data-view="new">＋ New incident</button>
+          <button class="avatar" id="user-menu" title="User profile">U</button>
+        </div>
+      </header>
+      <section class="content" id="view-root" aria-live="polite"></section>
+    </main>
+  </div>
+
+  <div class="toast-region" id="toast-region"></div>
+  <div class="modal-backdrop hidden" id="modal-backdrop">
+    <div class="modal" id="modal"></div>
+  </div>
+  <script src="/dashboard/assets/dashboard.js" defer></script>
+</body>
+</html>

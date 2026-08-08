@@ -1,0 +1,6 @@
+const loginForm=document.getElementById('login-form'),registerForm=document.getElementById('register-form');
+function tab(name){const login=name==='login';loginForm.classList.toggle('hidden',!login);registerForm.classList.toggle('hidden',login);document.getElementById('login-tab').className=login?'primary':'secondary';document.getElementById('register-tab').className=login?'secondary':'primary'}
+document.getElementById('login-tab').onclick=()=>tab('login');document.getElementById('register-tab').onclick=()=>tab('register');
+async function submit(form,url,errorId){const error=document.getElementById(errorId);error.textContent='';const body=Object.fromEntries(new FormData(form));try{const response=await fetch(url,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});const data=await response.json();if(!response.ok)throw new Error(data.detail||'Request failed');location.href='/dashboard'}catch(e){error.textContent=e.message}}
+loginForm.onsubmit=e=>{e.preventDefault();submit(loginForm,'/api/v1/auth/login','login-error')};registerForm.onsubmit=e=>{e.preventDefault();submit(registerForm,'/api/v1/auth/register','register-error')};
+fetch('/api/v1/auth/me').then(r=>{if(r.ok)location.href='/dashboard'});
