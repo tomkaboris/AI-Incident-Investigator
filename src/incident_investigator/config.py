@@ -1,8 +1,10 @@
 import json
 from enum import StrEnum
 from functools import lru_cache
+
 from pydantic import Field, model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
+
 
 class AIProvider(StrEnum):
     OPENAI = "openai"

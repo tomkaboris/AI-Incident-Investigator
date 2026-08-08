@@ -7,7 +7,6 @@ from alembic.config import Config
 
 from incident_investigator.config import get_settings
 
-
 MIGRATIONS_DIR = Path(__file__).resolve().parent / "migrations"
 
 
