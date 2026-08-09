@@ -1,3 +1,20 @@
+## 0.10.0 - GitHub/GHE source correlation
+
+### Added
+- Optional read-only GitHub and GitHub Enterprise source-code correlation.
+- Stack-trace/file/line extraction for Python, Java/Kotlin, and generic source locations.
+- Error-text source search with bounded candidate and context limits.
+- `source_analysis` JSON on initial and multi-agent investigation results without a DB migration.
+- Dashboard Source Analysis tab with repository/file/function/line, confidence, source snippet, and link.
+- Log-only fallback when GitHub is disabled or unavailable.
+- GitHub configuration checks in `incident-investigator doctor`.
+- Source-correlation unit tests and documented `.env` settings.
+
+### Security
+- GitHub tokens remain server-side and are never sent to AI models or returned by API/health/dashboard.
+- Retrieved source is treated as untrusted evidence in AI prompts.
+- GitHub integration failures cannot fail the core incident-analysis workflow.
+
 ## 0.9.0 - Unified archive dashboard and AI cost estimates
 
 ### Added

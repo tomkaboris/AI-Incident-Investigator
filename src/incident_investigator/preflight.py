@@ -8,7 +8,6 @@ giving `incident-investigator` users actionable errors before optional imports f
 from __future__ import annotations
 
 import importlib.util
-import os
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -83,39 +82,6 @@ def _database_backend(database_url: str) -> str:
     return scheme
 
 
-def _env_file_contains_database_url(env_path: Path) -> bool:
-    """Check whether DATABASE_URL is explicitly declared in a .env file."""
-    if not env_path.is_file():
-        return False
-
-    try:
-        content = env_path.read_text(encoding="utf-8")
-    except OSError:
-        return False
-
-    for raw_line in content.splitlines():
-        line = raw_line.strip()
-
-        if not line or line.startswith("#"):
-            continue
-
-        if line.startswith("export "):
-            line = line.removeprefix("export ").lstrip()
-
-        if line.startswith("DATABASE_URL="):
-            return True
-
-    return False
-
-
-def _database_url_explicitly_configured(env_path: Path) -> bool:
-    """Return True when the user explicitly configured DATABASE_URL."""
-    if os.getenv("DATABASE_URL"):
-        return True
-
-    return _env_file_contains_database_url(env_path)
-
-
 def _database_choices_hint() -> str:
     """Return install instructions for every supported database backend."""
     return (
@@ -164,14 +130,14 @@ def collect_diagnostics(
     backend = _database_backend(database_url)
     driver_info = _DATABASE_DRIVERS.get(backend)
 
-    database_explicitly_configured = _database_url_explicitly_configured(env_path)
+    database_explicitly_configured = "database_url" in settings.model_fields_set
 
     if driver_info:
         module_name = driver_info["module"]
         extra = driver_info["extra"]
 
         if not _module_available(module_name):
-            if database_explicitly_configured or backend == "sqlite":
+            if database_explicitly_configured:
                 diagnostics.append(
                     Diagnostic(
                         level="error",
@@ -191,7 +157,7 @@ def collect_diagnostics(
                         level="error",
                         message=(
                             "No database backend was explicitly configured, "
-                            "and the default SQLite driver is not installed."
+                            "and no database driver is installed."
                         ),
                         hint=_database_choices_hint(),
                     )
@@ -238,6 +204,34 @@ def collect_diagnostics(
                 hint=hint,
             )
         )
+
+    if settings.github_enabled:
+        if not settings.github_token:
+            diagnostics.append(
+                Diagnostic(
+                    level="error",
+                    message=(
+                        "GitHub source lookup is enabled, but GITHUB_TOKEN is missing."
+                    ),
+                    hint=(
+                        "Configure a read-only GitHub/GHE token with repository contents "
+                        "and code-search access, or set GITHUB_ENABLED=false."
+                    ),
+                )
+            )
+        if not settings.github_base_url:
+            diagnostics.append(
+                Diagnostic(
+                    level="warning",
+                    message=(
+                        "GITHUB_BASE_URL is not configured; https://github.com will be used."
+                    ),
+                    hint=(
+                        "For GitHub Enterprise Server set, for example, "
+                        "GITHUB_BASE_URL=https://github.company.example."
+                    ),
+                )
+            )
 
     if settings.ai_provider is AIProvider.OPENAI and not settings.ai_api_key:
         diagnostics.append(

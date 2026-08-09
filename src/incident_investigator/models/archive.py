@@ -2,11 +2,14 @@ from datetime import datetime
 from typing import Any
 
 from pydantic import BaseModel, Field
+from pydantic.json_schema import SkipJsonSchema
 
 from incident_investigator.models.incident import (
     IncidentCategory,
     IncidentSeverity,
 )
+
+from incident_investigator.source_analysis.models import SourceAnalysis
 
 
 class ArtifactEvidence(BaseModel):
@@ -47,6 +50,7 @@ class ArchiveIncidentAnalysis(BaseModel):
     analyzed_time_window_start: datetime | None = None
     analyzed_time_window_end: datetime | None = None
     markdown_report: str
+    source_analysis: SkipJsonSchema[SourceAnalysis | None] = None
 
 
 class ArchiveCreatedResponse(BaseModel):

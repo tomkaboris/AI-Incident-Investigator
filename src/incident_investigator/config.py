@@ -70,6 +70,21 @@ class Settings(BaseSettings):
     database_echo: bool = False
     database_auto_create: bool = True
 
+    # Optional GitHub / GitHub Enterprise source-code correlation.
+    github_enabled: bool = False
+    github_source_lookup_enabled: bool = True
+    github_base_url: str | None = None
+    github_api_url: str | None = None
+    github_token: str | None = None
+    github_organization: str | None = None
+    github_default_branch: str | None = None
+    github_context_lines: int = Field(default=25, ge=5, le=200)
+    github_max_search_results: int = Field(default=5, ge=1, le=50)
+    github_max_candidates: int = Field(default=8, ge=1, le=50)
+    github_max_queries: int = Field(default=6, ge=1, le=20)
+    github_timeout_seconds: float = Field(default=10.0, ge=1.0, le=120.0)
+    github_verify_ssl: bool = True
+
     model_config = SettingsConfigDict(
         env_file=".env",
         env_file_encoding="utf-8",

@@ -1,6 +1,9 @@
 from enum import StrEnum
 
 from pydantic import BaseModel, Field
+from pydantic.json_schema import SkipJsonSchema
+
+from incident_investigator.source_analysis.models import SourceAnalysis
 
 
 class IncidentCategory(StrEnum):
@@ -47,3 +50,4 @@ class IncidentAnalysis(BaseModel):
     )
 
     requires_human_review: bool = True
+    source_analysis: SkipJsonSchema[SourceAnalysis | None] = None

@@ -12,6 +12,8 @@ AI Incident Investigator is a FastAPI and CLI application that analyzes uploaded
 - SHA-256 integrity verification before orchestration or download
 - Configurable upload size, extension, content type, and binary-file policies
 - Alembic migrations and typed Python package
+- Optional GitHub/GitHub Enterprise source-code correlation with log-only fallback
+- Dashboard source analysis with repository, file, function, line range, confidence, and snippet
 
 ## Installation
 
@@ -128,17 +130,66 @@ incident-investigator doctor
 
 The normal `serve` and `migrate` commands run the same preflight automatically. A missing `.env` is a warning so Docker/CI environment-variable deployments continue to work. Missing dependencies or required configuration are reported as actionable errors.
 
-Example for a plain `pip install ai-incident-investigator` with the default SQLite URL:
+Example for a plain `pip install ai-incident-investigator` without an explicitly configured database:
 
 ```text
 AI Incident Investigator configuration check
+
 [WARNING] No .env file found in /your/current/directory.
-          Create .env in this directory, or provide the same settings through environment variables (useful for Docker/CI). See README Configuration.
-[ERROR] Database backend 'sqlite' is configured, but its Python driver 'aiosqlite' is not installed.
-          Install the matching database extra: pip install "ai-incident-investigator[sqlite]"
-[ERROR] AI_PROVIDER=openai is configured, but AI_API_KEY is missing.
-          Add AI_API_KEY=... to .env or provide AI_API_KEY as an environment variable.
+
+[ERROR] No database backend was explicitly configured, and no database driver is installed.
+
+          SQLite is used by default when DATABASE_URL is not configured.
+
+          Choose the database backend you want to use:
+
+            SQLite:
+              pip install "ai-incident-investigator[sqlite]"
+
+            PostgreSQL:
+              pip install "ai-incident-investigator[postgresql]"
+
+            MySQL:
+              pip install "ai-incident-investigator[mysql]"
 ```
+
+## GitHub / GitHub Enterprise source correlation
+
+Source correlation is optional. When it is disabled, the investigator still scans the uploaded log for common stack-trace and compiler locations such as Python `File "...", line N`, Java/Kotlin frames, and `path/to/file.ext:N` references. Those locations are shown as **inferred from log** and are never presented as repository-verified facts.
+
+To verify the location against GitHub or GitHub Enterprise Server, configure a read-only account/token that can search and read the repositories relevant to your incidents:
+
+```env
+GITHUB_ENABLED=true
+GITHUB_BASE_URL=https://github.company.example
+GITHUB_TOKEN=replace-with-read-only-token
+# Optional: restrict search to one organization. Leave blank to search repositories
+# visible to the configured account/token.
+GITHUB_ORGANIZATION=my-organization
+
+GITHUB_SOURCE_LOOKUP_ENABLED=true
+GITHUB_CONTEXT_LINES=25
+GITHUB_MAX_SEARCH_RESULTS=5
+GITHUB_MAX_CANDIDATES=8
+GITHUB_MAX_QUERIES=6
+GITHUB_TIMEOUT_SECONDS=10
+GITHUB_VERIFY_SSL=true
+```
+
+For GitHub.com use `GITHUB_BASE_URL=https://github.com`. For GitHub Enterprise Server, the REST API URL is derived as `<GITHUB_BASE_URL>/api/v3`; use `GITHUB_API_URL` only if your installation exposes the API at a different URL. `GITHUB_DEFAULT_BRANCH` is optional and should normally be left blank so the repository default branch is used.
+
+The integration is deliberately read-only: it uses code search and repository-content reads. The token is kept in server-side settings and is never included in AI prompts, API responses, stored investigation JSON, health responses, or dashboard HTML. Use the minimum repository permissions required by your GitHub/GHE configuration. GitHub documents repository-content reads as requiring `Contents: read` for fine-grained tokens/GitHub Apps.
+
+Lookup order:
+
+1. Extract file, function, and line hints directly from the log.
+2. Search by concrete stack-trace filename/path.
+3. Search stable error-message fragments when no direct source match is sufficient.
+4. Read a bounded source context around the best candidate.
+5. Give that context to the AI as **untrusted evidence**, never as instructions.
+6. Store the source result inside the existing JSON analysis result. No database migration is required.
+
+Possible source statuses are `resolved`, `inferred_from_log`, `multiple_candidates`, `not_found`, `not_configured`, and `lookup_failed`. A GitHub timeout, permission error, or unavailable GHE server never fails the core incident analysis; the dashboard instead shows the fallback status and any location that could still be inferred from the log.
 
 ## Run
 

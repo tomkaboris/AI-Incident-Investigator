@@ -92,4 +92,9 @@ async def health() -> dict[str, str]:
         ).lower(),
         "database": settings.database_url.split(":", maxsplit=1)[0],
         "storage_backend": settings.storage_backend.value,
+        "github_source_lookup": (
+            "enabled"
+            if settings.github_enabled and settings.github_source_lookup_enabled
+            else "disabled"
+        ),
     }
