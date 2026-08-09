@@ -169,15 +169,14 @@ def collect_diagnostics(
     if driver_info:
         module_name = driver_info["module"]
         extra = driver_info["extra"]
-        database_name = driver_info["name"]
 
         if not _module_available(module_name):
-            if database_explicitly_configured:
+            if database_explicitly_configured or backend == "sqlite":
                 diagnostics.append(
                     Diagnostic(
                         level="error",
                         message=(
-                            f"{database_name} is configured, but the required "
+                            f"Database backend '{backend}' is configured, but the required "
                             f"Python driver '{module_name}' is not installed."
                         ),
                         hint=(
