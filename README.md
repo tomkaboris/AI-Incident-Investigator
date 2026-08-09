@@ -21,13 +21,33 @@ Local storage with SQLite:
 pip install "ai-incident-investigator[sqlite]"
 ```
 
-PostgreSQL, MySQL, or S3 support:
+Choose exactly the database extra you use:
 
 ```bash
+# SQLite
+pip install "ai-incident-investigator[sqlite]"
+
+# PostgreSQL
 pip install "ai-incident-investigator[postgresql]"
+
+# MySQL / MariaDB
 pip install "ai-incident-investigator[mysql]"
-pip install "ai-incident-investigator[s3]"
 ```
+
+S3 is a storage extra in addition to the database extra. Combine extras when needed:
+
+```bash
+# SQLite + S3 / MinIO
+pip install "ai-incident-investigator[sqlite,s3]"
+
+# PostgreSQL + S3 / MinIO
+pip install "ai-incident-investigator[postgresql,s3]"
+
+# MySQL + S3 / MinIO
+pip install "ai-incident-investigator[mysql,s3]"
+```
+
+Installing only `pip install ai-incident-investigator` installs the core package but no database driver. The CLI detects this before startup and prints the exact extra to install.
 
 All integrations:
 
@@ -43,7 +63,7 @@ pip install -e ".[dev]"
 
 ## Configuration
 
-Copy `.env.example` to `.env`.
+Create a `.env` file in the directory where you run `incident-investigator`. Docker and CI deployments may provide the same values as environment variables instead, so `.env` itself is not mandatory in those environments.
 
 ```env
 AI_PROVIDER=openai
@@ -97,6 +117,28 @@ incident-investigator migrate
 ### Upgrade from 0.2.0
 
 Migration `20260725_0002` removes `raw_log` from the relational database. It deliberately stops when existing incidents are present because it cannot safely select credentials and upload historical data to an external backend. Export important legacy logs, use a clean database, or create a deployment-specific data migration before running the upgrade.
+
+## Preflight check
+
+Before starting the service you can validate the current directory, configured database driver, AI provider, and optional storage dependencies:
+
+```bash
+incident-investigator doctor
+```
+
+The normal `serve` and `migrate` commands run the same preflight automatically. A missing `.env` is a warning so Docker/CI environment-variable deployments continue to work. Missing dependencies or required configuration are reported as actionable errors.
+
+Example for a plain `pip install ai-incident-investigator` with the default SQLite URL:
+
+```text
+AI Incident Investigator configuration check
+[WARNING] No .env file found in /your/current/directory.
+          Create .env in this directory, or provide the same settings through environment variables (useful for Docker/CI). See README Configuration.
+[ERROR] Database backend 'sqlite' is configured, but its Python driver 'aiosqlite' is not installed.
+          Install the matching database extra: pip install "ai-incident-investigator[sqlite]"
+[ERROR] AI_PROVIDER=openai is configured, but AI_API_KEY is missing.
+          Add AI_API_KEY=... to .env or provide AI_API_KEY as an environment variable.
+```
 
 ## Run
 

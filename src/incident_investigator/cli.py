@@ -1,11 +1,27 @@
 """Command-line interface for AI Incident Investigator."""
 
+from __future__ import annotations
+
 import argparse
+import sys
 
 import uvicorn
 
 
+def _run_preflight() -> bool:
+    """Print actionable startup diagnostics and return whether startup may continue."""
+    from incident_investigator.config import get_settings
+    from incident_investigator.preflight import collect_diagnostics, format_diagnostics, has_errors
+
+    diagnostics = collect_diagnostics(get_settings())
+    if diagnostics:
+        print(format_diagnostics(diagnostics), file=sys.stderr)
+    return not has_errors(diagnostics)
+
+
 def _serve(host: str, port: int) -> None:
+    if not _run_preflight():
+        raise SystemExit(2)
     uvicorn.run(
         "incident_investigator.main:app",
         host=host,
@@ -13,8 +29,26 @@ def _serve(host: str, port: int) -> None:
     )
 
 
+def _migrate(revision: str) -> None:
+    if not _run_preflight():
+        raise SystemExit(2)
+    from incident_investigator.database.migration_runner import upgrade_database
+
+    upgrade_database(revision)
+
+
+def _doctor() -> None:
+    from incident_investigator.config import get_settings
+    from incident_investigator.preflight import collect_diagnostics, format_diagnostics, has_errors
+
+    diagnostics = collect_diagnostics(get_settings())
+    print(format_diagnostics(diagnostics))
+    if has_errors(diagnostics):
+        raise SystemExit(2)
+
+
 def main() -> None:
-    """Run the API server or a maintenance command."""
+    """Run the API server, migrations, or configuration diagnostics."""
     parser = argparse.ArgumentParser(prog="incident-investigator")
     subparsers = parser.add_subparsers(dest="command")
 
@@ -27,12 +61,19 @@ def main() -> None:
     )
     migrate_parser.add_argument("--revision", default="head")
 
+    subparsers.add_parser(
+        "doctor",
+        help="Validate configuration and optional dependencies without starting the server.",
+    )
+
     args = parser.parse_args()
 
     if args.command == "migrate":
-        from incident_investigator.database.migration_runner import upgrade_database
+        _migrate(args.revision)
+        return
 
-        upgrade_database(args.revision)
+    if args.command == "doctor":
+        _doctor()
         return
 
     if args.command == "serve":
