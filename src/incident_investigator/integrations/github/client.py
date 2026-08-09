@@ -33,11 +33,16 @@ class GitHubClient:
         if not settings.github_token:
             raise GitHubIntegrationError("GITHUB_TOKEN is not configured.")
 
+        # Prefer an explicit base URL when provided by the caller. This ensures
+        # users that pass `github_base_url` (for example in tests) get an API
+        # URL derived from that base even if an environment-provided
+        # `GITHUB_API_URL` exists.
         web_url = (settings.github_base_url or "https://github.com").rstrip("/")
-        api_url = settings.github_api_url
-        if not api_url:
+        if settings.github_base_url:
             hostname = (urlparse(web_url).hostname or "").lower()
             api_url = "https://api.github.com" if hostname == "github.com" else f"{web_url}/api/v3"
+        else:
+            api_url = settings.github_api_url or "https://api.github.com"
 
         return cls(
             api_url=api_url.rstrip("/"),
