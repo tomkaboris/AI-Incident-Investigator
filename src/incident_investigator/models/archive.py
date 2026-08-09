@@ -8,7 +8,6 @@ from incident_investigator.models.incident import (
     IncidentCategory,
     IncidentSeverity,
 )
-
 from incident_investigator.source_analysis.models import SourceAnalysis
 
 

@@ -23,11 +23,11 @@ from incident_investigator.database.models import (
 from incident_investigator.models.archive import ArchiveIncidentAnalysis
 from incident_investigator.models.incident import Evidence, IncidentAnalysis
 from incident_investigator.repositories.incident_repository import IncidentRepository
-from incident_investigator.storage import calculate_sha256, get_log_storage
 from incident_investigator.source_analysis import (
     safe_analyze_source_location,
     source_context_for_prompt,
 )
+from incident_investigator.storage import calculate_sha256, get_log_storage
 
 
 def normalize_incident_time(value: datetime | None, timezone_name: str) -> datetime | None:

@@ -29,7 +29,7 @@ class GitHubClient:
     max_search_results: int
 
     @classmethod
-    def from_settings(cls, settings: Settings) -> "GitHubClient":
+    def from_settings(cls, settings: Settings) -> GitHubClient:
         if not settings.github_token:
             raise GitHubIntegrationError("GITHUB_TOKEN is not configured.")
 
