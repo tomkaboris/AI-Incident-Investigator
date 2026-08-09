@@ -78,7 +78,10 @@ def collect_diagnostics(settings: Settings, *, cwd: Path | None = None) -> list[
         diagnostics.append(
             Diagnostic(
                 level="error",
-                message="S3 storage is configured, but the optional dependency 'boto3' is not installed.",
+                message=(
+                    "S3 storage is configured, but the optional dependency "
+                    "'boto3' is not installed."
+                ),
                 hint=(
                     "Install S3 together with your database extra, for example: "
                     'pip install "ai-incident-investigator[sqlite,s3]"'
@@ -104,7 +107,10 @@ def collect_diagnostics(settings: Settings, *, cwd: Path | None = None) -> list[
             diagnostics.append(
                 Diagnostic(
                     level="error",
-                    message="AI_PROVIDER=litellm is configured, but LiteLLM support is not installed.",
+                    message=(
+                        "AI_PROVIDER=litellm is configured, but LiteLLM support "
+                        "is not installed."
+                    ),
                     hint='Install it with: pip install "ai-incident-investigator[litellm]"',
                 )
             )
@@ -114,7 +120,10 @@ def collect_diagnostics(settings: Settings, *, cwd: Path | None = None) -> list[
             Diagnostic(
                 level="warning",
                 message="SESSION_SECRET_KEY is still using the development default.",
-                hint="Set a long random SESSION_SECRET_KEY before exposing the service beyond local development.",
+                hint=(
+                    "Set a long random SESSION_SECRET_KEY before exposing "
+                    "the service beyond local development."
+                ),
             )
         )
 
