@@ -1,5 +1,8 @@
 [build-system]
-requires = ["setuptools>=77"]
+requires = [
+    "setuptools>=80",
+    "setuptools-scm[simple]>=9.2",
+]
 build-backend = "setuptools.build_meta"
 
 [project]
@@ -71,9 +74,6 @@ incident-investigator = "incident_investigator.cli:main"
 Homepage = "https://github.com/tomkaboris/AI-Incident-Investigator"
 Repository = "https://github.com/tomkaboris/AI-Incident-Investigator"
 Issues = "https://github.com/tomkaboris/AI-Incident-Investigator/issues"
-
-[tool.setuptools.dynamic]
-version = { attr = "incident_investigator.__version__" }
 
 [tool.setuptools.packages.find]
 where = ["src"]
