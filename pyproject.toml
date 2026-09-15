@@ -1,7 +1,7 @@
 [build-system]
 requires = [
     "setuptools>=80",
-    "setuptools-scm[simple]>=9.2",
+    "setuptools-scm[simple]>=10",
 ]
 build-backend = "setuptools.build_meta"
 
@@ -91,3 +91,5 @@ target-version = "py312"
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "B", "UP", "SIM"]
+
+[tool.setuptools_scm]

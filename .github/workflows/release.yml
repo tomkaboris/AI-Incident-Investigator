@@ -20,23 +20,27 @@ jobs:
   release:
     runs-on: ubuntu-latest
 
+    outputs:
+      tag: ${{ steps.version.outputs.tag }}
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
-      - name: Get latest tag
+      - name: Get latest version tag
         id: latest
         shell: bash
         run: |
-          latest_tag=$(git tag --list 'v*' --sort=-v:refname | head -n 1)
+          latest_tag=$(git tag --list 'v[0-9]*.[0-9]*.[0-9]*' --sort=-v:refname | head -n 1)
 
           if [ -z "$latest_tag" ]; then
             latest_tag="v0.0.0"
           fi
 
           echo "tag=$latest_tag" >> "$GITHUB_OUTPUT"
+          echo "Latest tag: $latest_tag"
 
       - name: Calculate next version
         id: version
@@ -60,6 +64,10 @@ jobs:
             patch)
               patch=$((patch + 1))
               ;;
+            *)
+              echo "Unsupported bump type: ${{ inputs.bump }}"
+              exit 1
+              ;;
           esac
 
           version="${major}.${minor}.${patch}"
@@ -68,7 +76,18 @@ jobs:
           echo "version=$version" >> "$GITHUB_OUTPUT"
           echo "tag=$tag" >> "$GITHUB_OUTPUT"
 
-          echo "Creating release $tag"
+          echo "Next version: $version"
+          echo "Next tag: $tag"
+
+      - name: Check that tag does not already exist
+        shell: bash
+        run: |
+          tag="${{ steps.version.outputs.tag }}"
+
+          if git rev-parse "$tag" >/dev/null 2>&1; then
+            echo "Tag $tag already exists."
+            exit 1
+          fi
 
       - name: Create GitHub Release
         env:
@@ -78,3 +97,14 @@ jobs:
             --target "${{ github.sha }}" \
             --title "${{ steps.version.outputs.tag }}" \
             --generate-notes
+
+  publish:
+    needs: release
+
+    permissions:
+      contents: read
+      id-token: write
+
+    uses: ./.github/workflows/publish-pypi.yml
+    with:
+      ref: ${{ needs.release.outputs.tag }}
